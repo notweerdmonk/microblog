@@ -4,20 +4,15 @@
 <table>
     <tr valign='center'>
         <td><img src='{{ user.avatar(128) }}'></td>
-        <td><h1>User: {{ user.username }}</h1></td>
+        <td>
+            <h1>User: {{ user.username }}</h1>
+        </td>
     </tr>
 </table>
 <hr>
 {% for post in posts %}
 <p>
-<table>
-    <tr valign='center'>
-        <td><img src='{{ user.avatar(36) }}'></td>
-        <td>
-            {{ post.author.username }} says: <b>{{ post.body }}</b>
-        </td>
-    </tr>
-</table>
+{% include '_post.html' %}
 </p>
 {% endfor %}
 {% endblock %}

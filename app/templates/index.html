@@ -12,13 +12,7 @@
 {% for post in posts %} 
 <div>
     <p>
-    <table>
-        <tr valign='center'>
-            <td><img src='{{ post.author.avatar(36) }}'></td>
-            <td>{{ post.author.username }} says: <b>{{ post.body }}</b>
-            </td>
-        </tr>
-    </table>
+    {% include '_post.html' %}
     </p>
 </div>
 {% endfor %}
