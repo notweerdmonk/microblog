@@ -6,8 +6,9 @@ def test_new_user(new_user):
     """
     GIVEN a User model
     WHEN a new User is created
-    THEN check the username, email, password_hash properties and 
-    is_authenticated, is_active, is_anonymous and get_id methods.
+    THEN check username, email, password_hash properties are valid and
+    is_authenticated id is True, is_active is False, is_anonymous is False
+    and get_id method returns user id
     """
     assert new_user.username == 'Rahul'
     assert new_user.email == 'rahul@mail.com'
@@ -21,7 +22,7 @@ def test_new_post(new_post):
     """
     GIVEN a Post model
     WHEN a post is created
-    THEN check the timestamp, body, user_id, author fields
+    THEN check timestamp, body, user_id, author fields are valid
     """
     (user, post) = new_post
 
