@@ -44,3 +44,6 @@ if not app.debug:
 
         app.logger.setLevel(logging.INFO)
         app.logger.info('Starting up Microblog server')
+
+if __name__ == "__main__":
+    app.run()
