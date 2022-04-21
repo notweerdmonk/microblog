@@ -1,2 +1,3 @@
 FLASK_APP=microblog:app
-FLASK_DEBUG=1
+FLASK_ENV=production
+FLASK_DEBUG=0
