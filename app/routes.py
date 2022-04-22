@@ -1,7 +1,7 @@
 from flask import render_template, flash, redirect, url_for
 from flask import get_flashed_messages, request
 from app import app, db
-from app.forms import LoginForm, RegistrationForm, EditProfileForm
+from app.forms import LoginForm, RegistrationForm, EditProfileForm, NewPostForm
 from app.models import User, Post
 from flask_login import login_required, current_user, login_user, logout_user
 from werkzeug.urls import url_parse
@@ -13,12 +13,21 @@ def before_request():
         current_user.last_seen = datetime.utcnow()
         db.session.commit()
 
+def new_post(user, form):
+    post = Post(body=form.post_body.data, author=user)
+    if post is not None:
+        db.session.add(post)
+        db.session.commit()
+
 @app.route('/')
-@app.route('/index')
+@app.route('/index', methods=['GET', 'POST'])
 @login_required
 def index():
+    form = NewPostForm()
+    if form.validate_on_submit():
+        new_post(current_user, form)
     posts = Post.query.all()
-    return render_template('index.html', title = 'Home', posts=posts)
+    return render_template('index.html', title = 'Home', posts=posts, form=form)
 
 @app.route('/login', methods=['GET', 'POST'])
 def login():
@@ -62,12 +71,15 @@ def register():
         return redirect(url_for('login'))
     return render_template('register.html', title='Sign Up', form=form)
 
-@app.route('/user/<username>')
+@app.route('/user/<username>', methods=['GET', 'POST'])
 @login_required
 def user(username):
+    form = NewPostForm()
+    if form.validate_on_submit():
+        new_post(current_user, form)
     user = User.query.filter_by(username=username).first_or_404()
     posts = Post.query.filter_by(author=user).all()
-    return render_template('user.html', user=user, posts=posts)
+    return render_template('user.html', user=user, posts=posts, form=form)
 
 @app.route('/edit_profile', methods=['GET', 'POST'])
 @login_required

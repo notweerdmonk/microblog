@@ -42,7 +42,8 @@ class RegistrationForm(FlaskForm):
 class EditProfileForm(FlaskForm):
     username = StringField('Username', validators=[DataRequired(),
         Length(min=0, max=32)])
-    about_me = TextAreaField('About me', validators=[Length(min=0, max=140)])
+    about_me = TextAreaField('About me', validators=[Length(min=0, max=140)],
+            render_kw={'style': 'resize: none;'})
     submit = SubmitField('Save')
     cancel = SubmitField('Cancel')
 
@@ -56,3 +57,8 @@ class EditProfileForm(FlaskForm):
             user = User.query.filter_by(username=username.data).first()
             if user is not None:
                 raise ValidationError('Please use a different username')
+
+class NewPostForm(FlaskForm):
+    post_body = TextAreaField('New post', validators=[Length(min=0, max=140)],
+            render_kw={'style': 'resize: none;'})
+    post = SubmitField('Post')

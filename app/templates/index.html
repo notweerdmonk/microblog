@@ -9,6 +9,8 @@
 </ul>
 {% endif %}
 <h1>Hello, {{ current_user.username }}!</h1>
+<hr>
+{% include '_new_post.html' %}
 {% for post in posts %} 
 <div>
     <p>
