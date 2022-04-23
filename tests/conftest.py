@@ -19,7 +19,8 @@ def add_new_user(new_user):
     In case of error the database can contain the test user.
     If so delete the user first.
     '''
-    user_from_db = User.query.filter_by(username=new_user.username).first()
+    user_from_db =\
+        db.session.query(User.id).filter_by(username=new_user.username).first()
     if user_from_db is not None:
         db.session.delete(user_from_db)
         db.session.commit()
@@ -53,9 +54,11 @@ def add_new_post(new_post):
     '''
     user, post = new_post
 
-    user_from_db = User.query.filter_by(username=user.username).first()
+    user_from_db =\
+        db.session.query(User).filter_by(username=user.username).first()
     if user_from_db is not None:
-        post_from_db = Post.query.filter_by(author=user_from_db).first()
+        post_from_db =\
+            db.session.query(Post).filter_by(author=user_from_db).first()
         if post_from_db is not None:
             db.session.delete(post_from_db)
         db.session.delete(user_from_db)
