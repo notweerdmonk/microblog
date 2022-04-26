@@ -1,13 +1,13 @@
 <form action='' method='post'>
-    {{ form.hidden_tag() }}
+    {{ forms[0].hidden_tag() }}
     <p>
-    {{ form.post_body.label }}<br>
-    {{ form.post_body(cols=50, rows=4) }}
-    {% for error in form.post_body.errors %}
+    {{ forms[0].post_body.label }}<br>
+    {{ forms[0].post_body(cols=50, rows=4) }}
+    {% for error in forms[0].post_body.errors %}
     <span style='color: red;'>[{{ error }}]</span>
     {% endfor %}
     </p>
     <p>
-    <span>{{ form.post() }}</span>
+    <span>{{ forms[0].post() }}</span>
     </p>
 </form>

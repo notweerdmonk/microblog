@@ -62,3 +62,6 @@ class NewPostForm(FlaskForm):
     post_body = TextAreaField('New post', validators=[Length(min=0, max=140)],
             render_kw={'style': 'resize: none;'})
     post = SubmitField('Post')
+
+class EmptyForm(FlaskForm):
+    submit = SubmitField('Submit')
