@@ -35,21 +35,21 @@ def test_new_post(new_post):
     WHEN a post is created
     THEN check timestamp, body, user_id, author fields are valid
     """
-    (user, post) = new_post
+    (users, posts) = new_post
 
     timestamp = datetime(year=2022, month=4, day=19,
             hour=15, minute=30, second=0, microsecond=0)
 
-    assert post.timestamp == timestamp
-    assert post.body == 'Flask is awesome.'
-    assert post.user_id == user.id
-    assert post.author == user
+    assert posts.timestamp == timestamp
+    assert posts.body == 'Flask is awesome.'
+    assert posts.user_id == users.id
+    assert posts.author == users
 
 def test_add_new_post(add_new_post):
     """
-    GIVEN a Post model
-    WHEN a post is created
-    THEN check timestamp, body, user_id, author fields are valid
+    GIVEN instances of User and Post
+    WHEN the instances are added to database
+    THEN check if database is updated correctly
     """
     (user, post) = add_new_post
 
@@ -60,3 +60,32 @@ def test_add_new_post(add_new_post):
     assert post.body == 'Flask is awesome.'
     assert post.user_id == user.id
     assert post.author == user
+
+def test_follow_user(follow_user):
+    """
+    GIVEN two instances of User
+    WHEN one user follows another
+    THEN check is_following method, followed and followers count,
+    and if database is updated correctly
+    """
+    (user1, user2, posts) = follow_user
+
+    assert user1.is_following(user2) == True
+    assert user1.followed.count() == 1
+    assert user1.followed.first().username == user2.username
+    assert user2.followers.count() == 1
+    assert user2.followers.first().username == user1.username
+    assert user1.posts().all() == posts 
+
+def test_unfollow_user(unfollow_user):
+    """
+    GIVEN two instances of User
+    WHEN one user unfollows another
+    THEN check is_following method, followed and followers count,
+    and if database is updated correctly
+    """
+    (user1, user2) = unfollow_user
+
+    assert user1.is_following(user2) == False
+    assert user1.followed.count() == 0
+    assert user2.followers.count() == 0
