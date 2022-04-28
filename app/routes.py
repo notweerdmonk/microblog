@@ -19,6 +19,10 @@ def new_post(user, form):
         db.session.add(post)
         db.session.commit()
 
+def pagination_urls(route, obj):
+    return url_for(route, page=obj.prev_num) if obj.has_prev else None,\
+        url_for(route, page=obj.next_num) if obj.has_next else None,
+
 @app.route('/')
 @app.route('/index', methods=['GET', 'POST'])
 @login_required
@@ -26,9 +30,14 @@ def index():
     form = NewPostForm()
     if form.validate_on_submit():
         new_post(current_user, form)
+        flash('Your post is now live!')
         return redirect(url_for('index'))
-    posts = current_user.posts().all()
-    return render_template('index.html', title = 'Home', posts=posts, forms=[form])
+    page = request.args.get('page', 1, type=int)
+    posts = current_user.posts().paginate(
+            page, app.config['POSTS_PER_PAGE'], False)
+    prev_url, next_url = pagination_urls('index', posts)
+    return render_template('index.html', title = 'Home', posts=posts.items,
+            prev_url=prev_url, next_url=next_url, forms=[form])
 
 @app.route('/login', methods=['GET', 'POST'])
 def login():
@@ -36,10 +45,7 @@ def login():
     if current_user.is_authenticated:
         return redirect(url_for('index'))
     if form.validate_on_submit():
-        print(form.username)
-        print(form.password)
         user = User.query.filter_by(username=form.username.data).first()
-        print(user)
         if user is None or not user.check_password(form.password.data):
             flash('Invalid username or password')
             return redirect(url_for('login'))
@@ -61,10 +67,7 @@ def register():
         return redirect(url_for('index'))
     form = RegistrationForm()
     if form.validate_on_submit():
-        print(form.username.data)
-        print(form.password.data)
         user = User(username=form.username.data, email=form.email.data)
-        print(user)
         user.set_password(form.password.data)
         db.session.add(user)
         db.session.commit()
@@ -79,11 +82,18 @@ def user(username):
     form2 = EmptyForm()
     if form1.validate_on_submit():
         new_post(current_user, form1)
+        flash('Your post is now live!')
         return redirect(url_for('user', username=username))
     user = User.query.filter_by(username=username).first_or_404()
-    posts = Post.query.filter_by(author=user).all()
-    return render_template(
-            'user.html', user=user, posts=posts, forms=[form1, form2])
+    page = request.args.get('page', 1, type=int)
+    posts = user.post.order_by(Post.timestamp.desc())\
+            .paginate(page, app.config['POSTS_PER_PAGE'], False)
+    prev_url = url_for('user', username=username, page=posts.prev_num) \
+            if posts.has_prev else None
+    next_url = url_for('user', username=username, page=posts.next_num) \
+            if posts.has_next else None
+    return render_template('user.html', user=user, posts=posts.items,
+            prev_url=prev_url, next_url=next_url, forms=[form1, form2])
 
 @app.route('/edit_profile', methods=['GET', 'POST'])
 @login_required
@@ -140,4 +150,13 @@ def unfollow(username):
         return redirect(url_for('user', username=username))
     else:
         return redirect(url_for('index'))
-    
+
+@app.route('/explore')
+@login_required
+def explore():
+    page = request.args.get('page', 1, type=int)
+    posts = Post.query.order_by(Post.timestamp.desc()).paginate(
+            page, app.config['POSTS_PER_PAGE'], False)
+    prev_url, next_url = pagination_urls('explore', posts)
+    return render_template('index.html', title='Explore', posts=posts.items,
+            prev_url=prev_url, next_url=next_url)
