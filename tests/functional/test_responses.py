@@ -11,7 +11,7 @@ def test_index_anon_resp(test_client):
 
     assert response.status_code == 302
     assert 'Location' in headers.keys()
-    assert headers['Location'] == '/login?next=%2Findex'
+    assert headers['Location'] == '/auth/login?next=%2Findex'
 
 def test_login_anon_resp(test_client):
     '''
@@ -19,7 +19,7 @@ def test_login_anon_resp(test_client):
     WHEN GET request is made to the page by anonymous user
     THEN check if response code is 200
     '''
-    response = test_client.get('/login')
+    response = test_client.get('/auth/login')
 
     assert response.status_code == 200
 
@@ -29,7 +29,7 @@ def test_logout_anon_resp(test_client):
     WHEN GET request is made to the page by anonymous user
     THEN check if response code is 302
     '''
-    response = test_client.get('/logout')
+    response = test_client.get('/auth/logout')
     headers = dict(response.headers)
 
     assert response.status_code == 302
@@ -42,7 +42,7 @@ def test_register_anon_resp(test_client):
     WHEN GET request is made to the page by anonymous user
     THEN check if response code is 200
     '''
-    response = test_client.get('/register')
+    response = test_client.get('/auth/register')
 
     assert response.status_code == 200
 
@@ -67,6 +67,6 @@ def test_edit_profile_anon_resp(test_client):
     headers = dict(response.headers)
 
     assert 'Location' in headers.keys()
-    assert headers['Location'] == '/login?next=%2Fedit_profile'
+    assert headers['Location'] == '/auth/login?next=%2Fedit_profile'
 
     assert response.status_code == 302

@@ -1,10 +1,32 @@
 # define fixtures for testing
 
 import pytest
-from app import app, db
+from app import db, create_app
+from config import Config
 from app.models import User, Post
 from werkzeug.security import generate_password_hash
 from datetime import datetime, timezone, timedelta
+
+class TestConfig(Config):
+    TESTING = True
+    SQLALCHEMY_DATABASE_URI = 'sqlite://'
+
+@pytest.fixture(scope='module')
+def create_new_app():
+    return create_app(TestConfig)
+
+@pytest.fixture(scope='module')
+def test_client(create_new_app):
+    new_app = create_new_app
+    new_app_context = new_app.app_context()
+    new_app_context.push()
+    db.create_all()
+
+    yield new_app.test_client()
+
+    db.session.remove()
+    db.drop_all()
+    new_app_context.pop()
 
 def create_new_users():
     users = []
@@ -24,7 +46,7 @@ def new_user():
     return create_new_users()[0]
 
 @pytest.fixture(scope='function')
-def add_new_user(new_user):
+def add_new_user(test_client, new_user):
     '''
     In case of error the database can contain the test user.
     If so delete the user first.
@@ -64,7 +86,7 @@ def new_post(new_user):
     return new_user, new_post
 
 @pytest.fixture(scope='function')
-def add_new_post(new_user):
+def add_new_post(test_client, new_user):
     user = new_user
 
     timestamp = datetime(year=2022, month=4, day=19,
@@ -148,7 +170,3 @@ def unfollow_user(follow_user):
     db.session.commit()
 
     yield user1, user2
-
-@pytest.fixture(scope='module')
-def test_client():
-    return app.test_client()
