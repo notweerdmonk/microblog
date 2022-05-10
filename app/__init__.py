@@ -8,6 +8,7 @@ from flask_mail import Mail
 from flask_moment import Moment
 import logging
 from logging.handlers import SMTPHandler, RotatingFileHandler
+from flask_bootstrap import Bootstrap5
 
 db = SQLAlchemy()
 migrate = Migrate()
@@ -15,6 +16,7 @@ login = LoginManager()
 login.login_view = 'auth.login'
 mail = Mail()
 moment = Moment()
+bootstrap = Bootstrap5()
 
 def create_app(config_class=Config):
     app = Flask(__name__)
@@ -25,6 +27,7 @@ def create_app(config_class=Config):
     login.init_app(app)
     mail.init_app(app)
     moment.init_app(app)
+    bootstrap.init_app(app)
 
     from app.errors import bp as errors_bp
     app.register_blueprint(errors_bp)

@@ -36,9 +36,11 @@ def index():
     page = request.args.get('page', 1, type=int)
     posts = current_user.posts().paginate(
             page, current_app.config['POSTS_PER_PAGE'], False)
-    prev_url, next_url = pagination_urls('main.index', posts)
+    #prev_url, next_url = pagination_urls('main.index', posts)
+    #return render_template('index.html', title = 'Home', posts=posts.items,
+    #        prev_url=prev_url, next_url=next_url, forms=[form])
     return render_template('index.html', title = 'Home', posts=posts.items,
-            prev_url=prev_url, next_url=next_url, forms=[form])
+            pagination=posts, forms=[form])
 
 @bp.route('/user/<username>', methods=['GET', 'POST'])
 @login_required
@@ -53,12 +55,14 @@ def user(username):
     page = request.args.get('page', 1, type=int)
     posts = user.post.order_by(Post.timestamp.desc())\
             .paginate(page, current_app.config['POSTS_PER_PAGE'], False)
-    prev_url = url_for('main.user', username=username, page=posts.prev_num) \
-            if posts.has_prev else None
-    next_url = url_for('main.user', username=username, page=posts.next_num) \
-            if posts.has_next else None
+    #prev_url = url_for('main.user', username=username, page=posts.prev_num) \
+    #        if posts.has_prev else None
+    #next_url = url_for('main.user', username=username, page=posts.next_num) \
+    #        if posts.has_next else None
+    #return render_template('user.html', user=user, posts=posts.items,
+    #        prev_url=prev_url, next_url=next_url, forms=[form1, form2])
     return render_template('user.html', user=user, posts=posts.items,
-            prev_url=prev_url, next_url=next_url, forms=[form1, form2])
+            pagination=posts, forms=[form1, form2])
 
 @bp.route('/edit_profile', methods=['GET', 'POST'])
 @login_required
@@ -122,6 +126,8 @@ def explore():
     page = request.args.get('page', 1, type=int)
     posts = Post.query.order_by(Post.timestamp.desc()).paginate(
             page, current_app.config['POSTS_PER_PAGE'], False)
-    prev_url, next_url = pagination_urls('main.explore', posts)
+    #prev_url, next_url = pagination_urls('main.explore', posts)
+    #return render_template('index.html', title='Explore', posts=posts.items,
+    #        prev_url=prev_url, next_url=next_url)
     return render_template('index.html', title='Explore', posts=posts.items,
-            prev_url=prev_url, next_url=next_url)
+            pagination=posts)

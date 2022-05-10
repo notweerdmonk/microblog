@@ -1,13 +1,7 @@
-<form action='' method='post'>
-    {{ forms[0].hidden_tag() }}
-    <p>
-    {{ forms[0].post_body.label }}<br>
-    {{ forms[0].post_body(cols=50, rows=4) }}
-    {% for error in forms[0].post_body.errors %}
-    <span style='color: red;'>[{{ error }}]</span>
-    {% endfor %}
-    </p>
-    <p>
-    <span>{{ forms[0].post() }}</span>
-    </p>
-</form>
+{% from 'bootstrap5/form.html' import render_form %}
+
+<div class="row">
+    <div class="col-md-4">
+        {{ render_form(forms[0]) }}
+    </div>
+</div>

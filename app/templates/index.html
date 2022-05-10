@@ -1,4 +1,5 @@
 {% extends 'base.html' %}
+{% from 'bootstrap5/pagination.html' import render_pagination %}
 
 {% block content %}
 {% if messages %}
@@ -18,10 +19,13 @@
 {% include '_post.html' %}
 </p>
 {% endfor %}
+{#
 {% if prev_url %}
 <a href={{ prev_url }}>Newer posts</a>
 {% endif %}
 {% if next_url %}
 <a href={{ next_url }}>Older posts</a>
 {% endif %}
+#}
+{{ render_pagination(pagination) }}
 {% endblock %}
