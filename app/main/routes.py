@@ -37,9 +37,9 @@ def index():
     posts = current_user.posts().paginate(
             page, current_app.config['POSTS_PER_PAGE'], False)
     #prev_url, next_url = pagination_urls('main.index', posts)
-    #return render_template('index.html', title = 'Home', posts=posts.items,
+    #return render_template('main/index.html', title = 'Home', posts=posts.items,
     #        prev_url=prev_url, next_url=next_url, forms=[form])
-    return render_template('index.html', title = 'Home', posts=posts.items,
+    return render_template('main/index.html', title = 'Home', posts=posts.items,
             pagination=posts, forms=[form])
 
 @bp.route('/user/<username>', methods=['GET', 'POST'])
@@ -59,9 +59,9 @@ def user(username):
     #        if posts.has_prev else None
     #next_url = url_for('main.user', username=username, page=posts.next_num) \
     #        if posts.has_next else None
-    #return render_template('user.html', user=user, posts=posts.items,
+    #return render_template('main/user.html', user=user, posts=posts.items,
     #        prev_url=prev_url, next_url=next_url, forms=[form1, form2])
-    return render_template('user.html', user=user, posts=posts.items,
+    return render_template('main/user.html', user=user, posts=posts.items,
             pagination=posts, forms=[form1, form2])
 
 @bp.route('/edit_profile', methods=['GET', 'POST'])
@@ -79,7 +79,7 @@ def edit_profile():
         form.about_me.data = current_user.about_me
     elif form.cancel.data == True:
         return redirect(url_for('main.user', username=current_user.username))
-    return render_template('edit_profile.html', title='Edit Profile',
+    return render_template('main/edit_profile.html', title='Edit Profile',
             form=form)
 
 @bp.route('/follow/<username>', methods=['POST'])
@@ -127,7 +127,7 @@ def explore():
     posts = Post.query.order_by(Post.timestamp.desc()).paginate(
             page, current_app.config['POSTS_PER_PAGE'], False)
     #prev_url, next_url = pagination_urls('main.explore', posts)
-    #return render_template('index.html', title='Explore', posts=posts.items,
+    #return render_template('main/index.html', title='Explore', posts=posts.items,
     #        prev_url=prev_url, next_url=next_url)
-    return render_template('index.html', title='Explore', posts=posts.items,
+    return render_template('main/index.html', title='Explore', posts=posts.items,
             pagination=posts)

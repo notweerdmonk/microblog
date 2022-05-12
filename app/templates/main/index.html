@@ -1,4 +1,4 @@
-{% extends 'base.html' %}
+{% extends 'main/base.html' %}
 {% from 'bootstrap5/pagination.html' import render_pagination %}
 
 {% block content %}
@@ -12,11 +12,11 @@
 <h1>Hello, {{ current_user.username }}!</h1>
 <hr>
 {% if forms %}
-{% include '_new_post.html' %}
+{% include 'main/_new_post.html' %}
 {% endif %}
 {% for post in posts %} 
 <p>
-{% include '_post.html' %}
+{% include 'main/_post.html' %}
 </p>
 {% endfor %}
 {#
