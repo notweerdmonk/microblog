@@ -47,7 +47,6 @@ def test_register_anon_resp(test_client):
     assert response.status_code == 200
 
 def test_user_anon_resp(test_client):
-
     '''
     GIVEN user.html page
     WHEN GET request is made to the page by anonymous user
@@ -70,3 +69,16 @@ def test_edit_profile_anon_resp(test_client):
     assert headers['Location'] == '/auth/login?next=%2Fedit_profile'
 
     assert response.status_code == 302
+
+def test_explore_anon_resp(test_client):
+    '''
+    GIVEN explore.html page
+    WHEN GET request is made to the page by anonymous user
+    THEN check if response code is
+    '''
+    response = test_client.get('/explore')
+    headers = dict(response.headers)
+
+    assert response.status_code == 302
+    assert 'Location' in headers.keys()
+    assert headers['Location'] == '/auth/login?next=%2Fexplore'
