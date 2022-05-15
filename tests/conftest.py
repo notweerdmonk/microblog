@@ -6,6 +6,8 @@ from config import Config
 from app.models import User, Post
 from werkzeug.security import generate_password_hash
 from datetime import datetime, timezone, timedelta
+from flask_wtf.csrf import generate_csrf
+from flask import current_app, session
 
 class TestConfig(Config):
     TESTING = True
@@ -27,6 +29,44 @@ def test_client(create_new_app):
     db.session.remove()
     db.drop_all()
     new_app_context.pop()
+
+'''
+courtesy: https://gist.github.com/singingwolfboy/2fca1de64950d5dfed72
+'''
+class RequestShim(object):
+    """
+    A fake request that proxies cookie-related methods to a Flask test client.
+    """
+    def __init__(self, client):
+        self.client = client
+        self.vary = set({})
+
+    def set_cookie(self, key, value='', *args, **kwargs):
+        "Set the cookie on the Flask test client."
+        server_name = current_app.config["SERVER_NAME"] or "localhost"
+        return self.client.set_cookie(
+            server_name, key=key, value=value, *args, **kwargs)
+
+    def delete_cookie(self, key, *args, **kwargs):
+        "Delete the cookie on the Flask test client."
+        server_name = current_app.config["SERVER_NAME"] or "localhost"
+        return self.client.delete_cookie(
+            server_name, key=key, *args, **kwargs)
+
+@pytest.fixture(scope='module')
+def request_context(test_client):
+    '''
+    courtesy: https://gist.github.com/singingwolfboy/2fca1de64950d5dfed72
+    '''
+    request = RequestShim(test_client)
+    environ_overrides = {}
+    test_client.cookie_jar.inject_wsgi(environ_overrides)
+    with current_app.test_request_context('/auth/login'):
+        csrf_token = generate_csrf()
+        current_app.session_interface.save_session(
+                current_app, session, request)
+
+    yield session, csrf_token
 
 def create_new_users():
     users = []
