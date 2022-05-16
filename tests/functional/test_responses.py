@@ -13,6 +13,20 @@ def test_index_anon_resp(test_client):
     assert 'Location' in headers.keys()
     assert headers['Location'] == '/auth/login?next=%2Findex'
 
+def test_index_anon_redirect_resp(test_client):
+    '''
+    GIVEN index.html page
+    WHEN GET request is made to the page by anonymous user
+    THEN check if server redirects to login.html
+    '''
+    response = test_client.get('/index', follow_redirects=True)
+    body = str(response.data)
+
+    assert response.status_code == 200
+    assert len(response.history) == 1
+    assert response.request.path == '/auth/login'
+    assert 'Please log in to access this page.' in body
+
 def test_login_anon_resp(test_client):
     '''
     GIVEN login.html page
