@@ -9,6 +9,7 @@ from flask_moment import Moment
 import logging
 from logging.handlers import SMTPHandler, RotatingFileHandler
 from flask_bootstrap import Bootstrap5
+from elasticsearch import Elasticsearch
 
 db = SQLAlchemy()
 migrate = Migrate()
@@ -21,6 +22,16 @@ bootstrap = Bootstrap5()
 def create_app(config_class=Config):
     app = Flask(__name__)
     app.config.from_object(config_class)
+
+    elasticsearch_url = app.config['ELASTICSEARCH_URL']
+    elasticseach_cert = app.config['ELASTICSEARCH_CERT']
+    elasticseach_username = app.config['ELASTICSEARCH_USERNAME']
+    elasticsearch_password = app.config['ELASTICSEARCH_PASSWORD']
+    app.elasticsearch = Elasticsearch(
+            elasticsearch_url,
+            ca_certs=elasticseach_cert,
+            basic_auth=(elasticseach_username, elasticsearch_password)) \
+        if elasticsearch_url else None
 
     db.init_app(app)
     migrate.init_app(app)
