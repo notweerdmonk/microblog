@@ -8,6 +8,7 @@ from time import time
 import jwt
 from flask import current_app
 from app.search import add_to_index, remove_from_index, query_index
+from app.paginator import PaginatorShim
 
 @login.user_loader
 def load_user(id):
@@ -19,12 +20,12 @@ class SearchableMixin(object):
         ids, total = query_index(cls.__tablename__,
                                  expression, page, per_page)
         if total == 0:
-            return cls.query.filter(Post.id==0), 0
+            return PaginatorShim(cls.query.filter(Post.id==0).all(), 0, 0, 1)
         when = []
         for i in range(len(ids)):
             when.append((ids[i], i))
-        return cls.query.filter(cls.id.in_(ids)).order_by(
-            db.case(when, value=cls.id)), total
+        return PaginatorShim(cls.query.filter(cls.id.in_(ids)).order_by(
+            db.case(when, value=cls.id)).all(), total, page, per_page)
 
     @classmethod
     def before_commit(cls, session):
