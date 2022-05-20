@@ -33,6 +33,15 @@
                 </form>
             </p>
             {% endif %}
+            {% if user != current_user %}
+            <p>
+            <a class="btn btn-primary" role="button" 
+                                       href="{{ url_for('main.send_message',
+                                             recipient=user.username) }}">
+                    Send private message
+            </a>
+            </p>
+            {% endif %}
         </td>
     </tr>
 </table>

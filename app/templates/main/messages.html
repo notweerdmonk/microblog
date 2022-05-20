@@ -1,0 +1,12 @@
+{% extends 'main/base.html' %}
+{% from 'bootstrap5/pagination.html' import render_pagination %}
+
+{% block content %}
+<h1>Messages</h1>
+{% for post in messages %}
+<p>
+{% include 'main/_post.html' %}
+<p>
+{% endfor %}
+{{ render_pagination(pagination) }}
+{% endblock %}

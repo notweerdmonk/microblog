@@ -160,7 +160,7 @@ def search():
 @bp.route('/send_message/<recipient>', methods=['GET', 'POST'])
 @login_required
 def send_message(recipient):
-    user = User.query.filter(Post.username==recipient).first_or_404()
+    user = User.query.filter(User.username==recipient).first_or_404()
     form = MessageForm()
     if form.validate_on_submit():
         msg = Message(author=current_user, recipient=user,
@@ -169,6 +169,17 @@ def send_message(recipient):
         db.session.commit()
         flash('Your message has been sent.')
         return redirect(url_for('main.user', username=recipient))
-    return render_template('send_message.html', title='Send message',
+    return render_template('main/send_message.html', title='Send message',
             form=form, recipient=recipient)
 
+@bp.route('/messages')
+@login_required
+def messages():
+    current_user.last_message_read_time = datetime.utcnow()
+    db.session.commit()
+    page = request.args.get('page', 1, type=int)
+    messages = current_user.received_messages.order_by(
+            Message.timestamp.desc()).paginate(
+                    page, current_app.config['POSTS_PER_PAGE'], False)
+    return render_template('main/messages.html', messages=messages.items,
+            pagination=messages)
