@@ -1,7 +1,8 @@
 from flask import render_template, flash, redirect, url_for, request, g
 from app import db
-from app.main.forms import EditProfileForm, NewPostForm, EmptyForm, SearchForm
-from app.models import User, Post
+from app.main.forms import EditProfileForm, NewPostForm, EmptyForm, SearchForm, \
+        MessageForm
+from app.models import User, Post, Message
 from flask_login import login_required, current_user
 from werkzeug.urls import url_parse
 from datetime import datetime
@@ -112,11 +113,11 @@ def unfollow(username):
             flash('User {} not found!'.format(username))
             return redirect(url_for('main.index'))
         if user == current_user:
-            flash('You cannot follow yourself!')
+            flash('You cannot unfollow yourself!')
             return redirect(url_for('main.user', username=username))
         current_user.unfollow(user)
         db.session.commit()
-        flash('You are following {}'.format(username))
+        flash('You are not following {}'.format(username))
         return redirect(url_for('main.user', username=username))
     else:
         return redirect(url_for('main.index'))
@@ -155,4 +156,19 @@ def search():
     #        next_url=next_url, prev_url=prev_url)
     return render_template('main/search.html', title='Search', posts = posts.items,
             pagination=posts)
-    
+
+@bp.route('/send_message/<recipient>', methods=['GET', 'POST'])
+@login_required
+def send_message(recipient):
+    user = User.query.filter(Post.username==recipient).first_or_404()
+    form = MessageForm()
+    if form.validate_on_submit():
+        msg = Message(author=current_user, recipient=user,
+                body=form.message.data)
+        db.session.add(msg)
+        db.session.commit()
+        flash('Your message has been sent.')
+        return redirect(url_for('main.user', username=recipient))
+    return render_template('send_message.html', title='Send message',
+            form=form, recipient=recipient)
+

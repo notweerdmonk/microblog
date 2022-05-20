@@ -1,5 +1,6 @@
 {% extends 'main/base.html' %}
 {% from 'bootstrap5/pagination.html' import render_pagination %}
+{% from 'bootstrap5/form.html' import render_field %}
 
 {% block content %}
 <table>
@@ -18,16 +19,17 @@
             <p><a href="{{ url_for('main.edit_profile') }}">Edit your profile</a></p>
             {% elif not current_user.is_following(user) %}
             <p>
-                <form action="{{ url_for('main.follow', username=user.username) }}" method='POST'>
+                <form action="{{ url_for('main.follow', username=user.username) }}" 
+                    method='POST'>
                     {{ forms[1].hidden_tag() }}
-                    {{ forms[1].submit(value='Follow') }}
+                    {{ render_field(forms[1].submit, value='Follow') }}
                 </form>
             </p>
             {% else %}
             <p>
                 <form action="{{ url_for('main.unfollow', username=user.username) }}" method='POST'>
                     {{ forms[1].hidden_tag() }}
-                    {{ forms[1].submit(value='Unfollow') }}
+                    {{ render_field(forms[1].submit, value='Unfollow') }}
                 </form>
             </p>
             {% endif %}
