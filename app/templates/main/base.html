@@ -65,9 +65,11 @@
                             <a class="nav-link {% if request.path == '/messages' %} active {% endif %}" href="{{ url_for('main.messages') }}">
                             Messages
                             {% set new_msgs = current_user.new_messages() %}
-                            {% if new_msgs %}
-                            <span class="badge bg-secondary">{{ new_msgs }}</span>
-                            {% endif %}
+                            <span id="msg_count" class="badge bg-secondary"
+                                  style="visibility: {% if new_msgs %}visible
+                                                     {% else %}hidden{% endif %};">
+                                {{ new_msgs }}
+                            </span>
                             </a>
                         </li>
                         {{ render_nav_item('main.user', 'Profile',
@@ -94,6 +96,35 @@
         {% block scripts %}
         {{ moment.include_moment() }}
         {{ bootstrap.load_js() }}
+        <script>
+            function set_message_count(n) {
+                var badge = document.getElementById("msg_count");
+                badge.innerHTML = n;
+                badge.style.visibility = n ? 'visible' : 'hidden';
+            }
+            {% if current_user.is_authenticated %}
+            window.onload = function() {
+                var since = 0;
+                setInterval(function() {
+                    var request = new XMLHttpRequest();
+                    request.open("GET",
+                        "{{ url_for('main.notifications') }}?since=" + since);
+                    request.onreadystatechange = function() {
+                        if (this.readyState === 4 && this.status === 200) {
+                            const notifications = JSON.parse(this.responseText);
+                            for (var i = 0; i < notifications.length; i++) {
+                                if (notifications[i].name == 'unread_message_count') {
+                                    set_message_count(notifications[i].data);
+                                }
+                                since = notifications[i].timestamp;
+                            }
+                        }
+                    }
+                    request.send();
+                }, 10000);
+            }
+            {% endif %}
+        </script>
         {% endblock %}
     </body>
 </html>

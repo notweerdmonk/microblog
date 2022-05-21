@@ -2,12 +2,12 @@ from flask import render_template, flash, redirect, url_for, request, g
 from app import db
 from app.main.forms import EditProfileForm, NewPostForm, EmptyForm, SearchForm, \
         MessageForm
-from app.models import User, Post, Message
+from app.models import User, Post, Message, Notification
 from flask_login import login_required, current_user
 from werkzeug.urls import url_parse
 from datetime import datetime
 from app.main import bp
-from flask import current_app
+from flask import current_app, jsonify
 
 @bp.before_app_request
 def before_request():
@@ -168,6 +168,8 @@ def send_message(recipient):
         db.session.add(msg)
         db.session.commit()
         flash('Your message has been sent.')
+        user.add_notification('unread_message_count', user.new_messages())
+        db.session.commit()
         return redirect(url_for('main.user', username=recipient))
     return render_template('main/send_message.html', title='Send message',
             form=form, recipient=recipient)
@@ -176,6 +178,7 @@ def send_message(recipient):
 @login_required
 def messages():
     current_user.last_message_read_time = datetime.utcnow()
+    current_user.add_notification('unread_message_count', 0)
     db.session.commit()
     page = request.args.get('page', 1, type=int)
     messages = current_user.received_messages.order_by(
@@ -183,3 +186,16 @@ def messages():
                     page, current_app.config['POSTS_PER_PAGE'], False)
     return render_template('main/messages.html', messages=messages.items,
             pagination=messages)
+
+@bp.route('/notifications')
+@login_required
+def notifications():
+    since = request.args.get('since', 0.0, type=float)
+    notifications = current_user.notifications.filter(
+            Notification.timestamp > since).order_by(
+                    Notification.timestamp.asc())
+    return jsonify([{
+        'name': n.name,
+        'data': n.get_data(),
+        'timestamp': n.timestamp
+        } for n in notifications])

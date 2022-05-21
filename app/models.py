@@ -9,6 +9,8 @@ import jwt
 from flask import current_app
 from app.search import add_to_index, remove_from_index, query_index
 from app.paginator import PaginatorShim
+import json
+from time import time
 
 @login.user_loader
 def load_user(id):
@@ -149,6 +151,15 @@ class User(UserMixin, db.Model):
         return Message.query.filter_by(recipient=self).filter(
                 Message.timestamp > last_read_time).count()
 
+    notifications = db.relationship('Notification', backref='user',
+                                    lazy='dynamic')
+
+    def add_notification(self, name, data):
+        self.notifications.filter(Notification.name == name).delete()
+        n = Notification(name=name, payload_json=json.dumps(data), user=self)
+        db.session.add(n)
+        return n
+
 class Post(SearchableMixin, db.Model):
     __searchable__ = ['body']
     id = db.Column(db.Integer(), primary_key=True)
@@ -158,3 +169,13 @@ class Post(SearchableMixin, db.Model):
 
     def __repr__(self):
         return '<Date {}, Post {}>'.format(self.timestamp, self.body)
+
+class Notification(db.Model):
+    id = db.Column(db.Integer, primary_key=True)
+    name = db.Column(db.String(128), index=True)
+    user_id = db.Column(db.Integer, db.ForeignKey('user.id'))
+    timestamp = db.Column(db.Float, index=True, default=time)
+    payload_json = db.Column(db.Text)
+
+    def get_data(self):
+        return json.loads(str(self.payload_json))
