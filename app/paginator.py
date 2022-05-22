@@ -10,7 +10,7 @@ class PaginatorShim():
         self._total = total
         self._page = page_number
         self._per_page = per_page
-        max_page_number = int(self.total / per_page)
+        max_page_number = self.total // per_page
         remainder = self.total % per_page
         if remainder > 0:
             max_page_number = max_page_number + 1
