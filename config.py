@@ -31,3 +31,5 @@ class Config(object):
     ELASTICSEARCH_CERT = os.environ.get('ELASTICSEARCH_CERT')
     ELASTICSEARCH_USERNAME = os.environ.get('ELASTICSEARCH_USERNAME')
     ELASTICSEARCH_PASSWORD = os.environ.get('ELASTICSEARCH_PASSWORD')
+
+    REDIS_URL = os.environ.get('REDIS_URL') or 'redis://'

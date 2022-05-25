@@ -10,6 +10,8 @@ import logging
 from logging.handlers import SMTPHandler, RotatingFileHandler
 from flask_bootstrap import Bootstrap5
 from elasticsearch import Elasticsearch
+from redis import Redis
+import rq
 
 db = SQLAlchemy()
 migrate = Migrate()
@@ -32,6 +34,9 @@ def create_app(config_class=Config):
             ca_certs=elasticseach_cert,
             basic_auth=(elasticseach_username, elasticsearch_password)) \
         if elasticsearch_url else None
+
+    app.redis = Redis.from_url(app.config['REDIS_URL'])
+    app.task_queue = rq.Queue('microblog-tasks', connection=app.redis)
 
     db.init_app(app)
     migrate.init_app(app, db)
