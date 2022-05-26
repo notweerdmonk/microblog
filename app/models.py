@@ -11,6 +11,9 @@ from app.search import add_to_index, remove_from_index, query_index
 from app.paginator import PaginatorShim
 import json
 from time import time
+import redis
+import rq
+from sqlalchemy import and_
 
 @login.user_loader
 def load_user(id):

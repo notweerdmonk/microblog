@@ -91,6 +91,20 @@
             {% endfor %}
             {% endif %}
             {% endwith %}
+            {% if current_user.is_authenticated %}
+            {% with tasks = current_user.get_tasks_in_progress() %}
+            {% if tasks %}
+            <div class="container">
+                {% for task in tasks %}
+                <div class="alert alert-info" role="alert">
+                    {{ task.description }}
+                    <span id="{{ task.id }}-progress">{{ task.get_progress() }}</span>%
+                </div>
+                {% endfor %}
+            </div>
+            {% endif %}
+            {% endwith %}
+            {% endif %}
             {% block content %}{% endblock %}
         </div>
         {% block scripts %}
@@ -101,6 +115,12 @@
                 var badge = document.getElementById("msg_count");
                 badge.innerHTML = n;
                 badge.style.visibility = n ? 'visible' : 'hidden';
+            }
+            function set_task_progress(task_id, progress) {
+                var progress_span = document.getElementById(task_id+"-progress")
+                if (progress_span) {
+                    progress_span.innerHTML = progress
+                }
             }
             {% if current_user.is_authenticated %}
             window.onload = function() {
@@ -113,15 +133,22 @@
                         if (this.readyState === 4 && this.status === 200) {
                             const notifications = JSON.parse(this.responseText);
                             for (var i = 0; i < notifications.length; i++) {
-                                if (notifications[i].name == 'unread_message_count') {
-                                    set_message_count(notifications[i].data);
+                                switch (notifications[i].name) {
+                                    case 'unread_message_count':
+                                        set_message_count(notifications[i].data);
+                                        break;
+                                    case 'task_progress':
+                                        set_task_progress(
+                                            notifications[i].data.task_id,
+                                            notifications[i].data.progress);
+                                        break;
                                 }
                                 since = notifications[i].timestamp;
                             }
                         }
                     }
                     request.send();
-                }, 10000);
+                }, 5000);
             }
             {% endif %}
         </script>
