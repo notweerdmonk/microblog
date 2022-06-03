@@ -4,6 +4,7 @@ from app.api.auth import token_auth
 from app.models import User, Post
 from flask import url_for, abort
 from app import db
+from app.api.errors import bad_request
 
 @bp.route('/posts/<int:id>', methods=['GET'])
 @token_auth.login_required
