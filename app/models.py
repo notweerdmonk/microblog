@@ -256,7 +256,7 @@ class User(PaginatedAPIMixin, UserMixin, db.Model):
             return None
         return user
 
-class Post(SearchableMixin, db.Model):
+class Post(PaginatedAPIMixin, SearchableMixin, db.Model):
     __searchable__ = ['body']
     id = db.Column(db.Integer(), primary_key=True)
     timestamp = db.Column(db.DateTime(), index=True, default=datetime.utcnow)
@@ -265,6 +265,26 @@ class Post(SearchableMixin, db.Model):
 
     def __repr__(self):
         return '<Date {}, Post {}>'.format(self.timestamp, self.body)
+
+    def to_dict(self):
+        data = {
+            'id': self.id,
+            'timestamp': self.timestamp.isoformat() + 'Z',
+            'body': self.body,
+            'author': self.author.username,
+            '_links': {
+                'self': url_for('api.get_post', id=self.id),
+                'author': url_for('api.get_user', id=self.user_id)
+            }
+        }
+        return data
+
+    def from_dict(self, data):
+        if 'author' in data:
+            user = User.query.filter(User.username==data['author']).first()
+            self.author = user
+        if 'body' in data:
+            self.body = data['body']
 
 class Notification(db.Model):
     id = db.Column(db.Integer, primary_key=True)
