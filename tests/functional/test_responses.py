@@ -1,4 +1,6 @@
 import conftest
+import base64
+import json
 
 def test_index_anon_resp(test_client):
     '''
@@ -97,7 +99,7 @@ def test_explore_anon_resp(test_client):
     assert 'Location' in headers.keys()
     assert headers['Location'] == '/auth/login?next=%2Fexplore'
 
-def test_login_valid_auth_response(test_client, request_context, add_new_user):
+def test_login_valid_auth_resp(test_client, request_context, add_new_user):
     '''
     GIVEN login.html page
     WHEN POST request is made with valid credentials
@@ -113,3 +115,65 @@ def test_login_valid_auth_response(test_client, request_context, add_new_user):
     assert response.status_code == 302
     assert 'Location' in headers.keys()
     assert headers['Location'] == '/index'
+
+def test_api_auth_token_resp(test_client, add_new_user):
+    '''
+    GIVEN /api/tokens route
+    WHEN GET request is made
+    THEN check if response code is 405 (method not allowed)
+    '''
+    response = test_client.get('/api/tokens')
+
+    assert response.status_code == 405
+
+    '''
+    GIVEN /api/tokens route
+    WHEN POST request is made with invalid credentials
+    THEN check if response code is 401 (unauthorized)
+    '''
+    credentials = base64.b64encode(b'foo:bar').decode('utf-8')
+    response = test_client.post('/api/tokens',
+            headers={'Authorization': 'Basic ' + credentials})
+
+    assert response.status_code == 401
+    assert response.is_json == True
+    assert 'error' in response.json
+    assert response.json['error'] == 'Unauthorized'
+
+    '''
+    GIVEN /api/tokens route
+    WHEN POST request is made with valid credentials
+    THEN check if authorization token is returned
+    '''
+    credentials = base64.b64encode(b'Rahul:password').decode('utf-8')
+    response = test_client.post('/api/tokens',
+            headers={'Authorization': 'Basic ' + credentials})
+
+    assert response.status_code == 200
+    assert response.is_json == True
+    assert 'token' in response.json
+
+    token = response.json['token']
+
+    '''
+    GIVEN /api/tokens route
+    WHEN DELETE request is made with invalid token
+    THEN check if response code is 401 (unauthorized)
+    '''
+    response = test_client.delete('/api/tokens',
+            headers={'Authorization': 'Bearer foobar'})
+
+    assert response.status_code == 401
+    assert response.is_json == True
+    assert 'error' in response.json
+    assert response.json['error'] == 'Unauthorized'
+
+    '''
+    GIVEN /api/tokens route
+    WHEN DELETE request is made with valid token
+    THEN check if response code is 204 (no content)
+    '''
+    response = test_client.delete('/api/tokens',
+            headers={'Authorization': 'Bearer ' + token})
+
+    assert response.status_code == 204

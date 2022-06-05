@@ -20,4 +20,6 @@ https://blog.miguelgrinberg.com/post/the-flask-mega-tutorial-part-i-hello-world
 - Test follow and unfollow actions
 
 #### Funtional tests
-- Test response code of routes for anonymous user
+- Test response of routes for anonymous user
+- Test response of routes for authenticated user
+- Test response of routes for authorization token
