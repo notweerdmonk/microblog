@@ -4,11 +4,15 @@ https://blog.miguelgrinberg.com/post/the-flask-mega-tutorial-part-i-hello-world
 
 ## Additional features:
 
+### Bootstrap 5
+
+Uses bootstap-flask which supports Bootstrap 5.
+
 ### APIs related to blog posts
 
 | HTTP Method | URL                   | Notes                                   |
 |-------------|-----------------------|-----------------------------------------|
-| GET         | /api/posts/<id>       | Return the collection of all posts.     |
+| GET         | /api/posts/<id>       | Return a post.                          |
 | GET         | /api/posts/<username> | Return the collection of posts by user. |
 | POST        | /api/posts            | Create a new post for user.             |
 
