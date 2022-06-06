@@ -209,3 +209,10 @@ def export_posts():
         current_user.launch_task('export_posts', 'Exporting posts')
         db.session.commit()
     return redirect(url_for('main.user', username=current_user.username))
+
+@bp.route('/user/<username>/popup')
+@login_required
+def user_popup(username):
+    user = User.query.filter(User.username==username).first_or_404()
+    form = EmptyForm()
+    return render_template('main/user_popup.html', user=user, form=form)

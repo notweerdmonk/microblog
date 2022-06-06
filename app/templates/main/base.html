@@ -111,6 +111,82 @@
         {{ moment.include_moment() }}
         {{ bootstrap.load_js() }}
         <script>
+            var addFunctionOnWindowLoad = function(callback) {
+                if (window.addEventListener) {
+                    window.addEventListener('load', callback, false);
+                } else {
+                    window.attachEvent('onload', callback);
+                }
+            }
+            function set_hover_handlers() {
+                var timer = null;
+                var xhr = null;
+                var popover = null;
+                var user_popups = document.getElementsByClassName('user_popup');
+                for (var i = 0; i < user_popups.length; i++) {
+                    user_popups[i].addEventListener('mouseenter',
+                        function(event) {
+                            // mouse in event handler
+                            var element = event.currentTarget;
+                            timer = setTimeout(function() {
+                                timer = null;
+                                xhr = new XMLHttpRequest();
+                                xhr.open('GET', '/user/' +
+                                    element.firstElementChild.innerHTML.trim() +
+                                    '/popup');
+                                xhr.onreadystatechange = function() {
+                                    if (this.readyState === 4 &&
+                                        this.status === 200) {
+                                        /*
+                                        bootstrap.Popover.Default.allowList.table = [];
+                                        bootstrap.Popover.Default.allowList.td = [];
+                                        bootstrap.Popover.Default.allowList.tr = [];
+                                        bootstrap.Popover.Default.allowList.tbody = [];
+                                        bootstrap.Popover.Default.allowList.thead = [];
+                                        */
+                                        /*
+                                         * whitelisting table related tags
+                                         * breaks popover. instead disabling
+                                         * sanitization altogether allows
+                                         * putting table inside popover.
+                                         */
+                                        popover = new bootstrap.Popover(element, {
+                                                trigger: 'manual',
+                                                html: true,
+                                                animation: false,
+                                                container: element,
+                                                sanitize: false,
+                                                //offset: [0, 0],
+                                                content: this.responseText
+                                            });
+                                        popover.show();
+                                        flask_moment_render_all();
+                                        xhr = null;
+                                    }
+                                }
+                                xhr.send();
+                            }, 1000);
+                        }
+                    );
+                    user_popups[i].addEventListener('mouseleave',
+                        function(event) {
+                            // mouse out event handler
+                            var element = event.currentTarget;
+                            if (timer) {
+                                clearTimeout(timer);
+                                timer = null;
+                            } else if (xhr) {
+                                xhr.abort();
+                                xhr = null;
+                            } else {
+                                popover.dispose();
+                                popover = null;
+                            }
+                        }
+                    );
+                }
+            }
+            addFunctionOnWindowLoad(set_hover_handlers);
             function set_message_count(n) {
                 var badge = document.getElementById("msg_count");
                 badge.innerHTML = n;
@@ -123,7 +199,7 @@
                 }
             }
             {% if current_user.is_authenticated %}
-            window.onload = function() {
+            function get_notifications() {
                 var since = 0;
                 setInterval(function() {
                     var request = new XMLHttpRequest();
@@ -145,11 +221,13 @@
                                 }
                                 since = notifications[i].timestamp;
                             }
+                            request = null;
                         }
                     }
                     request.send();
                 }, 5000);
             }
+            addFunctionOnWindowLoad(get_notifications);
             {% endif %}
         </script>
         {% endblock %}
