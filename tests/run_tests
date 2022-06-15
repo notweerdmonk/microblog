@@ -1,2 +1,14 @@
 #!/bin/bash
-python3 -m pytest -v --setup-show --cov=app
+if [[ "$1" = "-k" ]]
+then
+    if [[ -n "$2" ]]
+    then
+        pattern=${2}
+    else
+        # matches every testcase
+        pattern=""
+    fi
+    python3 -m pytest -v --setup-show -cov=app -k "${pattern}"
+else
+    python3 -m pytest -v --setup-show --cov=app
+fi
