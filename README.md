@@ -10,11 +10,11 @@ Uses bootstrap-flask which supports Bootstrap 5.
 
 ### APIs related to blog posts
 
-| HTTP Method | URL                   | Notes                                   |
-|-------------|-----------------------|-----------------------------------------|
-| GET         | /api/posts/<id>       | Return a post.                          |
-| GET         | /api/posts/<username> | Return the collection of posts by user. |
-| POST        | /api/posts            | Create a new post for user.             |
+| HTTP Method | URL                         | Notes                                   |
+|-------------|-----------------------------|-----------------------------------------|
+| GET         | /api/posts/&lt;id&gt;       | Return a post.                          |
+| GET         | /api/posts/&lt;username&gt; | Return the collection of posts by user. |
+| POST        | /api/posts                  | Create a new post for user.             |
 
 ### Application testing with pytest
 
