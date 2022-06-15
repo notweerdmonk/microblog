@@ -6,7 +6,7 @@ https://blog.miguelgrinberg.com/post/the-flask-mega-tutorial-part-i-hello-world
 
 ### Bootstrap 5
 
-Uses bootstap-flask which supports Bootstrap 5.
+Uses bootstrap-flask which supports Bootstrap 5.
 
 ### APIs related to blog posts
 
