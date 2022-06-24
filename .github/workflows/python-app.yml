@@ -5,9 +5,9 @@ name: Python application
 
 on:
   push:
-    branches: [ development ]
+    branches: [ development, heroku_deployment ]
   pull_request:
-    branches: [ development ]
+    branches: [ development, heroku_deployment ]
 
 permissions:
   contents: read
