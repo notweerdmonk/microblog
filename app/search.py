@@ -1,33 +1,24 @@
 from flask import current_app
 
 def add_to_index(index, model):
-    if not current_app.elasticsearch:
-        return
-    payload = {}
-    for field in model.__searchable__:
-        payload[field] = getattr(model, field)
-    try:
-        current_app.elasticsearch.index(index=index, id=model.id, body=payload)
-    except:
-        return
+    pass
 
 def remove_from_index(index, model):
-    if not current_app.elasticsearch:
-        return
-    try:
-        current_app.elasticsearch.delete(index=index, id=model.id)
-    except:
-        return
+    pass
 
 def query_index(index, query, page, per_page):
-    if not current_app.elasticsearch:
-        return [], 0
     try:
-        search = current_app.elasticsearch.search(
-                index=index,
-                body={'query': {'multi_match': {'query': query, 'fields': ['*']}},
-                      'from': (page - 1) * per_page, 'size': per_page})
+        query = query.split()
+        expression = query[0]
+        for exp in query[1:]:
+            expression += ' & ' + exp
+        search = index.query.filter(index.body_tsvector.match(expression,
+            postgresql_regconfig='english'))
+        total = search.count()
+        results = search.paginate(page, per_page, False).items
     except:
         return [], 0
-    ids = [int(hit['_id']) for hit in search['hits']['hits']]
-    return ids, search['hits']['total']['value']
+    ids = []
+    for r in results:
+        ids.append(r.id)
+    return ids, total

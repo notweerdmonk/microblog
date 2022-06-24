@@ -17,6 +17,7 @@ from sqlalchemy import and_
 from flask import url_for
 import base64
 import os
+from sqlalchemy.sql import func
 
 @login.user_loader
 def load_user(id):
@@ -25,8 +26,9 @@ def load_user(id):
 class SearchableMixin(object):
     @classmethod
     def search(cls, expression, page, per_page):
-        ids, total = query_index(cls.__tablename__,
-                                 expression, page, per_page)
+        #ids, total = query_index(cls.__tablename__,
+        #                         expression, page, per_page)
+        ids, total = query_index(cls, expression, page, per_page)
         if total == 0:
             return PaginatorShim(cls.query.filter(Post.id==0).all(), 0, 0, 1)
         when = []
@@ -61,8 +63,8 @@ class SearchableMixin(object):
         for obj in cls.query:
             add_to_index(cls.__tablename__, obj)
 
-db.event.listen(db.session, 'before_commit', SearchableMixin.before_commit)
-db.event.listen(db.session, 'after_commit', SearchableMixin.after_commit)
+#db.event.listen(db.session, 'before_commit', SearchableMixin.before_commit)
+#db.event.listen(db.session, 'after_commit', SearchableMixin.after_commit)
 
 followers = db.Table('followers',
         db.Column('follower_id', db.Integer, db.ForeignKey('user.id')),
@@ -262,6 +264,11 @@ class Post(PaginatedAPIMixin, SearchableMixin, db.Model):
     timestamp = db.Column(db.DateTime(), index=True, default=datetime.utcnow)
     body = db.Column(db.String(140))
     user_id = db.Column(db.Integer(), db.ForeignKey('user.id'))
+
+    body_tsvector = func.to_tsvector('english', body);
+
+    __table_args__ = (db.Index('ix_body_tsvector', body_tsvector,
+        postgresql_using='gin'),)
 
     def __repr__(self):
         return '<Date {}, Post {}>'.format(self.timestamp, self.body)
