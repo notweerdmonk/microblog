@@ -106,7 +106,7 @@ class User(PaginatedAPIMixin, UserMixin, db.Model):
     id = db.Column(db.Integer, primary_key=True)
     username = db.Column(db.String(32), index = True, unique = True)
     email = db.Column(db.String(64), index = True, unique = True)
-    password_hash = db.Column(db.String(32))
+    password_hash = db.Column(db.String(128))
     post = db.relationship('Post', backref='author', lazy='dynamic')
     about_me = db.Column(db.String(140))
     last_seen = db.Column(db.DateTime, default=datetime.utcnow())
