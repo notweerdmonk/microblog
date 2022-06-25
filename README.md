@@ -2,6 +2,9 @@
 
 https://blog.miguelgrinberg.com/post/the-flask-mega-tutorial-part-i-hello-world
 
+Deployed: https://anothermicroblog.herokuapp.com
+(exporting posts will not work and site may not be up because of free dyno limitation)
+
 ## Additional features:
 
 ### Bootstrap 5
