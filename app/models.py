@@ -259,7 +259,7 @@ class User(PaginatedAPIMixin, UserMixin, db.Model):
         return user
 
 class Post(PaginatedAPIMixin, SearchableMixin, db.Model):
-    __searchable__ = ['body']
+    #__searchable__ = ['body']
     id = db.Column(db.Integer(), primary_key=True)
     timestamp = db.Column(db.DateTime(), index=True, default=datetime.utcnow)
     body = db.Column(db.String(140))
