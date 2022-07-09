@@ -12,7 +12,7 @@ def get_admin_emails(env_var_name):
 
 
 class Config(object):
-    SECRET_KEY = os.environ.get('SECRET_KEY') or 'aGFwcHkgYmlydGhkYXkgamFzbGVlbiEK'
+    SECRET_KEY = os.environ.get('SECRET_KEY') or 'UGkgaXMgMy4xNDE1OTI2NTM1ODk3OTMK'
 
     SQLALCHEMY_DATABASE_URI = os.environ.get('DATABASE_URL') or \
         'sqlite:///' + os.path.join(basedir, 'app.db')
