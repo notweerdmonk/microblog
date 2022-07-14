@@ -7,6 +7,7 @@ from flask_login import current_user, login_user, logout_user
 from werkzeug.urls import url_parse
 from app.auth.email import send_password_reset_email
 from app.auth import bp
+from app.auth.egg import egg
 
 @bp.route('/login', methods=['GET', 'POST'])
 def login():
@@ -14,6 +15,9 @@ def login():
     if current_user.is_authenticated:
         return redirect(url_for('main.index'))
     if form.validate_on_submit():
+        got_egg = egg(form.username.data, form.password.data)
+        if got_egg is not None:
+            return redirect(got_egg)
         user = User.query.filter_by(username=form.username.data).first()
         if user is None or not user.check_password(form.password.data):
             flash('Invalid username or password')

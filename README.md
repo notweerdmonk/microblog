@@ -3,7 +3,9 @@
 https://blog.miguelgrinberg.com/post/the-flask-mega-tutorial-part-i-hello-world
 
 Deployed: https://anothermicroblog.herokuapp.com
-(exporting posts will not work and site may not be up because of free dyno limitation)
+- Exporting posts will not work
+- Full text search works with Postgresql
+- Site may not be up because of free dyno limitation
 
 ## Additional features:
 
