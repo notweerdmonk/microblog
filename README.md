@@ -1,3 +1,5 @@
+![Tests](https://github.com/notweerdmonk/microblog/actions/workflows/python-app.yml/badge.svg?branch=heroku_deployment)
+
 # Flask tutorial with micro-blogging application.
 
 https://blog.miguelgrinberg.com/post/the-flask-mega-tutorial-part-i-hello-world
