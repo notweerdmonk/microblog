@@ -11,7 +11,7 @@ from flask import current_app, session
 
 class TestConfig(Config):
     TESTING = True
-    SQLALCHEMY_DATABASE_URI = 'sqlite://'
+    SQLALCHEMY_DATABASE_URI = 'postgresql://microblog_user:password@localhost:5432/microblog_test'
 
 @pytest.fixture(scope='module')
 def create_new_app():
