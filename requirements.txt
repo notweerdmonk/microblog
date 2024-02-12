@@ -10,7 +10,7 @@ commonmark==0.9.1
 coverage==6.3.2
 defusedxml==0.7.1
 Deprecated==1.2.13
-dnspython==2.2.1
+dnspython==2.6.0rc1
 elastic-transport==8.1.2
 elasticsearch==8.2.0
 email-validator==1.1.3
